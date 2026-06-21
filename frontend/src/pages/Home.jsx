@@ -52,7 +52,9 @@ export default function Home() {
       </section>
 
       {/* -------------------------------------------------------------- Search */}
-      <section className="container-px -mt-8 sm:-mt-10">
+      {/* relative z-10 so the overlapping card paints ABOVE the (positioned)
+          hero — otherwise the hero's edge clips the top of this card's heading. */}
+      <section className="relative z-10 container-px -mt-8 sm:-mt-10">
         <div className="card mx-auto max-w-4xl p-5 sm:p-7">
           <div className="mb-4">
             <h2 className="text-lg font-bold text-slate-900">{t('home.search.title')}</h2>
