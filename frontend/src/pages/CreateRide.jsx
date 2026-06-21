@@ -6,7 +6,14 @@ import { isSupabaseConfigured } from '../lib/supabase';
 import { todayISO } from '../lib/format';
 import { MAHARASHTRA_CITIES, MAX_SEATS } from '../lib/constants';
 import { ConfigNotice } from '../components/States';
-import { CheckCircleIcon, MapPinIcon, CalendarIcon, UsersIcon, ArrowRightIcon } from '../components/Icons';
+import {
+  CheckCircleIcon,
+  CheckIcon,
+  MapPinIcon,
+  CalendarIcon,
+  UsersIcon,
+  ArrowRightIcon,
+} from '../components/Icons';
 
 const EMPTY = {
   pickup_city: '',
@@ -27,6 +34,22 @@ export default function CreateRide() {
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState('');
   const [done, setDone] = useState(false);
+  const [manage, setManage] = useState(null); // { id, manage_token } after publish
+  const [copied, setCopied] = useState(false);
+
+  const manageLink = manage
+    ? `${window.location.origin}/manage/${manage.id}?token=${manage.manage_token}`
+    : '';
+
+  async function copyManageLink() {
+    try {
+      await navigator.clipboard.writeText(manageLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      /* clipboard may be unavailable; the link is shown for manual copy */
+    }
+  }
 
   function set(field, value) {
     setForm((f) => ({ ...f, [field]: value }));
@@ -82,7 +105,23 @@ export default function CreateRide() {
     }
     setSubmitting(true);
     try {
-      await createRide(form);
+      const created = await createRide(form);
+      setManage(created);
+      // Persist a local pointer so the creator can find this ride's manage link
+      // again from this device, even if they don't copy it now.
+      try {
+        const key = 'sahpravas_my_rides';
+        const list = JSON.parse(localStorage.getItem(key) || '[]');
+        list.unshift({
+          id: created.id,
+          token: created.manage_token,
+          route: `${form.pickup_city} → ${form.destination_city}`,
+          date: form.journey_date,
+        });
+        localStorage.setItem(key, JSON.stringify(list.slice(0, 50)));
+      } catch {
+        /* localStorage may be unavailable; non-critical */
+      }
       setDone(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {
@@ -97,6 +136,8 @@ export default function CreateRide() {
     setErrors({});
     setServerError('');
     setDone(false);
+    setManage(null);
+    setCopied(false);
   }
 
   if (!isSupabaseConfigured) return <ConfigNotice />;
@@ -110,6 +151,36 @@ export default function CreateRide() {
           </div>
           <h2 className="mt-4 text-2xl font-bold text-slate-900">{t('create.success.title')}</h2>
           <p className="mt-2 text-sm text-slate-600">{t('create.success.message')}</p>
+
+          {/* Private manage link — save it to see bookings / delete the ride */}
+          <div className="mt-6 rounded-2xl border border-brand-200 bg-brand-50 p-4 text-left">
+            <p className="text-sm font-bold text-brand-800">{t('create.success.manageTitle')}</p>
+            <p className="mt-1 text-xs leading-relaxed text-brand-700">
+              {t('create.success.manageNote')}
+            </p>
+            <div className="mt-3 flex gap-2">
+              <input
+                readOnly
+                value={manageLink}
+                onFocus={(e) => e.target.select()}
+                className="field-input flex-1 !py-2 text-xs"
+              />
+              <button onClick={copyManageLink} className="btn-secondary !px-3 !py-2 text-xs">
+                {copied ? <CheckIcon className="h-4 w-4 text-green-600" /> : null}
+                {copied ? t('create.success.copied') : t('create.success.copy')}
+              </button>
+            </div>
+            {manage && (
+              <Link
+                to={`/manage/${manage.id}?token=${manage.manage_token}`}
+                className="btn-primary mt-3 w-full !py-2.5 text-xs"
+              >
+                {t('create.success.manageOpen')}
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+            )}
+          </div>
+
           <div className="mt-6 flex flex-col gap-2 sm:flex-row">
             <Link to="/rides" className="btn-primary flex-1">
               {t('create.success.viewRides')}

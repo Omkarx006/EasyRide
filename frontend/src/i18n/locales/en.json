@@ -135,8 +135,37 @@
       "title": "Your ride is live!",
       "message": "Travellers can now see your ride and contact you directly. Thank you for sharing.",
       "viewRides": "View all rides",
-      "createAnother": "Offer another ride"
+      "createAnother": "Offer another ride",
+      "manageTitle": "Manage your ride",
+      "manageNote": "This private link lets you see who booked and delete the ride. Save it — it's the only way back, and we can't recover it for you.",
+      "manageOpen": "Open Manage page",
+      "copy": "Copy link",
+      "copied": "Copied!"
     }
+  },
+  "manage": {
+    "title": "Manage Ride",
+    "subtitle": "Private page for the ride creator.",
+    "loading": "Loading…",
+    "invalidLink": "Invalid or expired manage link",
+    "invalidLinkMessage": "This link is missing its access token or the ride no longer exists. Please use the exact link you saved when publishing.",
+    "rideSummary": "Your ride",
+    "bookingsTitle": "Passengers booked",
+    "bookingsCount_one": "{{count}} passenger",
+    "bookingsCount_other": "{{count}} passengers",
+    "noBookings": "No one has booked yet.",
+    "passenger": "Passenger",
+    "phone": "Phone",
+    "deleteRide": "Delete this ride",
+    "deleting": "Deleting…",
+    "confirmTitle": "Delete this ride?",
+    "confirmMessage": "This permanently removes your ride and all its bookings. This cannot be undone.",
+    "confirmYes": "Yes, delete",
+    "confirmNo": "Keep ride",
+    "deletedTitle": "Ride deleted",
+    "deletedMessage": "Your ride and its bookings have been removed.",
+    "backHome": "Back to home",
+    "deleteError": "Could not delete the ride. Please check your link and try again."
   },
   "booking": {
     "title": "Book a seat",
