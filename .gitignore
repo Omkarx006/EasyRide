@@ -1,0 +1,14 @@
+# dependencies / build (per-package .gitignore also applies)
+node_modules
+dist
+
+# env files — never commit real keys
+.env
+.env.local
+.env.*.local
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode
+.idea

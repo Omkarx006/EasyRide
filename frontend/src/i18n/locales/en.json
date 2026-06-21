@@ -1,0 +1,189 @@
+{
+  "app": {
+    "name": "SahPravas",
+    "tagline": "Travel together. Maharashtra's free community ride-sharing."
+  },
+  "nav": {
+    "home": "Home",
+    "findRide": "Find a Ride",
+    "offerRide": "Offer a Ride",
+    "language": "Language"
+  },
+  "trust": {
+    "badge": "No Commission • No Ads • Completely Free",
+    "free": "100% Free",
+    "noCommission": "No Commission",
+    "noAds": "No Ads",
+    "community": "Community Driven"
+  },
+  "home": {
+    "hero": {
+      "title": "Share the journey across Maharashtra",
+      "subtitle": "Going to another city? Offer your empty seats, or find a ride from a fellow traveller. Free, direct, and built for the community.",
+      "ctaFind": "Find a Ride",
+      "ctaOffer": "Offer a Ride"
+    },
+    "search": {
+      "title": "Where are you headed?",
+      "subtitle": "Search rides between cities in Maharashtra."
+    },
+    "why": {
+      "title": "Why SahPravas",
+      "items": [
+        {
+          "title": "Completely Free",
+          "desc": "No commission, no booking fees, no ads. Ever. The platform is a community service."
+        },
+        {
+          "title": "Direct Contact",
+          "desc": "Call or WhatsApp the driver directly. No middleman, no waiting for approvals."
+        },
+        {
+          "title": "Zero Sign-up",
+          "desc": "No accounts, no OTP, no passwords. Open the site and start right away."
+        },
+        {
+          "title": "Built for Maharashtra",
+          "desc": "Made for everyday intercity travel — Beed, Latur, Pune, and every town in between."
+        }
+      ]
+    },
+    "guidelines": {
+      "title": "Community Guidelines",
+      "subtitle": "A few simple things keep SahPravas safe and friendly for everyone.",
+      "items": [
+        "Share accurate trip details — route, time, and seats.",
+        "Confirm the fare (if any) directly with the driver before travelling.",
+        "Be on time and keep your travel companions informed.",
+        "Treat every co-traveller with courtesy and respect.",
+        "Never share rides for anything illegal or unsafe.",
+        "Verify the vehicle and driver details when you meet."
+      ]
+    }
+  },
+  "search": {
+    "from": "From city",
+    "to": "To city",
+    "date": "Travel date",
+    "anyCity": "Any city",
+    "anyDate": "Any date",
+    "submit": "Search Rides"
+  },
+  "filters": {
+    "title": "Filters",
+    "timeOfDay": "Time of day",
+    "seats": "Seats available",
+    "all": "All",
+    "morning": "Morning",
+    "afternoon": "Afternoon",
+    "evening": "Evening",
+    "night": "Night",
+    "seatsAny": "Any",
+    "clear": "Clear filters"
+  },
+  "ride": {
+    "driver": "Driver",
+    "departsOn": "Departs",
+    "at": "at",
+    "seatsLeft_one": "{{count}} seat left",
+    "seatsLeft_other": "{{count}} seats left",
+    "full": "Fully booked",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "book": "Book Seat",
+    "whatsappMessage": "Hello {{name}}, I saw your SahPravas ride from {{from}} to {{to}} on {{date}}. Is a seat still available?"
+  },
+  "rides": {
+    "title": "Available Rides",
+    "subtitle": "Active rides shared by the community.",
+    "results_one": "{{count}} ride found",
+    "results_other": "{{count}} rides found",
+    "summary": "{{from}} → {{to}}",
+    "loading": "Loading rides…",
+    "empty": {
+      "title": "No rides found",
+      "message": "There are no active rides matching your search right now. Try changing the filters — or be the first to offer this route!",
+      "cta": "Offer a Ride"
+    }
+  },
+  "create": {
+    "title": "Offer a Ride",
+    "subtitle": "Share your empty seats with fellow travellers. It only takes a minute.",
+    "sectionRoute": "Route",
+    "sectionWhen": "When",
+    "sectionSeats": "Seats & Contact",
+    "pickupCity": "Pickup city",
+    "pickupArea": "Pickup area / landmark",
+    "destinationCity": "Destination city",
+    "destinationArea": "Destination area / landmark",
+    "journeyDate": "Journey date",
+    "journeyTime": "Journey time",
+    "availableSeats": "Available seats",
+    "driverName": "Your name",
+    "phone": "Phone number",
+    "phonePrefix": "+91",
+    "placeholders": {
+      "city": "e.g. Beed",
+      "pickupArea": "e.g. Bus Stand, Shivaji Chowk",
+      "destinationArea": "e.g. Swargate, Railway Station",
+      "driverName": "e.g. Ramesh Patil",
+      "phone": "10-digit mobile number"
+    },
+    "submit": "Publish Ride",
+    "submitting": "Publishing…",
+    "success": {
+      "title": "Your ride is live!",
+      "message": "Travellers can now see your ride and contact you directly. Thank you for sharing.",
+      "viewRides": "View all rides",
+      "createAnother": "Offer another ride"
+    }
+  },
+  "booking": {
+    "title": "Book a seat",
+    "rideLabel": "{{from}} → {{to}} · {{date}}",
+    "passengerName": "Your name",
+    "passengerPhone": "Your phone number",
+    "namePlaceholder": "e.g. Sunita Jadhav",
+    "phonePlaceholder": "10-digit mobile number",
+    "note": "The driver will see your name and number so they can coordinate the pickup.",
+    "confirm": "Confirm Booking",
+    "booking": "Booking…",
+    "cancel": "Cancel",
+    "success": {
+      "title": "Seat booked!",
+      "message": "Please call or WhatsApp the driver to confirm your pickup point and timing.",
+      "done": "Done"
+    },
+    "errors": {
+      "no_seats": "Sorry, this ride just became fully booked.",
+      "ride_expired": "This ride has already departed.",
+      "ride_not_found": "This ride is no longer available.",
+      "invalid_phone": "Please enter a valid 10-digit phone number.",
+      "invalid_name": "Please enter your name.",
+      "generic": "Something went wrong. Please try again."
+    }
+  },
+  "validation": {
+    "required": "This field is required",
+    "phone10": "Enter exactly 10 digits",
+    "datePast": "Date cannot be in the past",
+    "seatsMin": "Seats must be at least 1",
+    "seatsMax": "That seems too many — please check",
+    "sameCity": "Pickup and destination cannot be the same city"
+  },
+  "footer": {
+    "tagline": "A free community ride-sharing platform for Maharashtra.",
+    "builtBy": "Built by the community, for the community.",
+    "disclaimer": "SahPravas only connects travellers. Trips, fares, and safety are arranged directly between users. Please travel responsibly."
+  },
+  "common": {
+    "close": "Close",
+    "retry": "Try again",
+    "error": "Something went wrong",
+    "loading": "Loading…"
+  },
+  "config": {
+    "missingTitle": "Setup needed",
+    "missingMessage": "Supabase is not configured yet. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your environment, then reload."
+  }
+}
