@@ -8,7 +8,7 @@ import BookingModal from '../components/BookingModal';
 import { Loader, ErrorState, EmptyRides, ConfigNotice } from '../components/States';
 import { fetchRides } from '../lib/rides';
 import { isSupabaseConfigured } from '../lib/supabase';
-import { timeBucket, seatsLeft } from '../lib/format';
+import { timeBucket, seatsLeft, isRideActive } from '../lib/format';
 
 const DEFAULT_FILTERS = { time: 'all', seats: 0 };
 
@@ -30,6 +30,13 @@ export default function Rides() {
   const [error, setError] = useState(false);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [bookingRide, setBookingRide] = useState(null);
+  // Re-evaluated every minute so rides drop off the moment they pass their
+  // (journey time + 1h) expiry, even while the page stays open.
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(id);
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,14 +59,13 @@ export default function Rides() {
   // Client-side refinement: time-of-day bucket + minimum seats available.
   const visibleRides = useMemo(() => {
     return rides.filter((ride) => {
-      // Fully-booked rides disappear automatically (also catches a ride that just
-      // filled up via booking, without needing a refetch).
-      if (seatsLeft(ride) <= 0) return false;
+      // Disappear 1h after departure time. Full rides stay (shown "Fully booked").
+      if (!isRideActive(ride, now)) return false;
       if (filters.time !== 'all' && timeBucket(ride.journey_time) !== filters.time) return false;
       if (filters.seats > 0 && seatsLeft(ride) < filters.seats) return false;
       return true;
     });
-  }, [rides, filters]);
+  }, [rides, filters, now]);
 
   const hasActiveFilters = filters.time !== 'all' || filters.seats > 0;
 

@@ -56,3 +56,22 @@ export function timeBucket(timeStr) {
 export function seatsLeft(ride) {
   return Math.max(0, (ride.available_seats ?? 0) - (ride.booked_seats ?? 0));
 }
+
+// A ride stays listed until this many minutes after its departure time, then it
+// disappears automatically (e.g. an 04:26 ride vanishes at 05:26).
+export const RIDE_GRACE_MINUTES = 60;
+
+// Epoch ms when a ride should drop off the listing (journey date+time + grace),
+// computed in the viewer's local timezone (IST for Maharashtra users).
+export function rideExpiresAt(ride) {
+  if (!ride?.journey_date || !ride?.journey_time) return Infinity;
+  const [y, m, d] = ride.journey_date.split('-').map(Number);
+  const [hh, mm] = ride.journey_time.split(':').map(Number);
+  const dt = new Date(y, m - 1, d, hh || 0, mm || 0, 0, 0);
+  return dt.getTime() + RIDE_GRACE_MINUTES * 60000;
+}
+
+// True while a ride is still within its visible window (not yet 1h past departure).
+export function isRideActive(ride, nowMs = Date.now()) {
+  return nowMs <= rideExpiresAt(ride);
+}
