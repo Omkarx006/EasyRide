@@ -6,6 +6,7 @@ import Home from './pages/Home';
 import Rides from './pages/Rides';
 import CreateRide from './pages/CreateRide';
 import ManageRide from './pages/ManageRide';
+import MyRides from './pages/MyRides';
 
 // Scroll to top on every navigation.
 function ScrollToTop() {
@@ -26,6 +27,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/rides" element={<Rides />} />
           <Route path="/create" element={<CreateRide />} />
+          <Route path="/my-rides" element={<MyRides />} />
           <Route path="/manage/:id" element={<ManageRide />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

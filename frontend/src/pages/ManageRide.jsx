@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useParams, useSearchParams, Link, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { fetchRideById, getRideBookings, deleteRide } from '../lib/rides';
+import { removeMyRide } from '../lib/myRides';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { formatDate, formatTime, seatsLeft } from '../lib/format';
 import { Loader, ConfigNotice } from '../components/States';
@@ -69,6 +70,7 @@ export default function ManageRide() {
     try {
       const result = await deleteRide(id, token);
       if (result?.success) {
+        removeMyRide(id); // keep the local "My Rides" list in sync
         setDeleted(true);
         setConfirming(false);
       } else {

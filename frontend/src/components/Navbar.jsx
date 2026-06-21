@@ -50,6 +50,9 @@ export default function Navbar() {
           <NavLink to="/rides" className={desktopLink}>
             {t('nav.findRide')}
           </NavLink>
+          <NavLink to="/my-rides" className={desktopLink}>
+            {t('nav.myRides')}
+          </NavLink>
           <LanguageToggle />
           <Link to="/create" className="btn-primary !px-4 !py-2 text-sm">
             {t('nav.offerRide')}
@@ -84,6 +87,9 @@ export default function Navbar() {
             <div className="container-px flex flex-col gap-1 py-3">
               <NavLink to="/rides" className={mobileLink} onClick={() => setOpen(false)}>
                 {t('nav.findRide')}
+              </NavLink>
+              <NavLink to="/my-rides" className={mobileLink} onClick={() => setOpen(false)}>
+                {t('nav.myRides')}
               </NavLink>
               <Link
                 to="/create"

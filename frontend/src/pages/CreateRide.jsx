@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { createRide } from '../lib/rides';
+import { addMyRide } from '../lib/myRides';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { todayISO } from '../lib/format';
 import { MAHARASHTRA_CITIES, MAX_SEATS } from '../lib/constants';
@@ -107,21 +108,14 @@ export default function CreateRide() {
     try {
       const created = await createRide(form);
       setManage(created);
-      // Persist a local pointer so the creator can find this ride's manage link
-      // again from this device, even if they don't copy it now.
-      try {
-        const key = 'sahpravas_my_rides';
-        const list = JSON.parse(localStorage.getItem(key) || '[]');
-        list.unshift({
-          id: created.id,
-          token: created.manage_token,
-          route: `${form.pickup_city} → ${form.destination_city}`,
-          date: form.journey_date,
-        });
-        localStorage.setItem(key, JSON.stringify(list.slice(0, 50)));
-      } catch {
-        /* localStorage may be unavailable; non-critical */
-      }
+      // Remember this ride on the device so the creator can reopen its manage page
+      // (see bookings / delete) anytime from "My Rides", even without the link.
+      addMyRide({
+        id: created.id,
+        token: created.manage_token,
+        route: `${form.pickup_city} → ${form.destination_city}`,
+        date: form.journey_date,
+      });
       setDone(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch {

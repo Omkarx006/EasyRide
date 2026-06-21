@@ -6,8 +6,18 @@
   "nav": {
     "home": "Home",
     "findRide": "Find a Ride",
+    "myRides": "My Rides",
     "offerRide": "Offer a Ride",
     "language": "Language"
+  },
+  "myRides": {
+    "title": "My Rides",
+    "subtitle": "Rides you've published from this device.",
+    "emptyTitle": "No rides yet",
+    "emptyMessage": "You haven't published any rides on this device. Offer one and it'll appear here so you can manage it anytime.",
+    "note": "Saved on this device only — no account needed. Tap Manage to see who booked or to delete a ride.",
+    "manage": "Manage",
+    "forget": "Remove from list"
   },
   "trust": {
     "badge": "No Commission • No Ads • Completely Free",
