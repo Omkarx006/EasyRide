@@ -1,18 +1,13 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { getMyRides, removeMyRide } from '../lib/myRides';
+import { getMyRides } from '../lib/myRides';
 import { formatDate } from '../lib/format';
-import { CarIcon, ArrowRightIcon, CalendarIcon, XIcon } from '../components/Icons';
+import { CarIcon, ArrowRightIcon, CalendarIcon } from '../components/Icons';
 
 export default function MyRides() {
   const { t, i18n } = useTranslation();
-  const [rides, setRides] = useState(() => getMyRides());
-
-  function forget(id) {
-    removeMyRide(id);
-    setRides(getMyRides());
-  }
+  const [rides] = useState(() => getMyRides());
 
   return (
     <div className="container-px py-8 sm:py-10">
@@ -56,14 +51,6 @@ export default function MyRides() {
                   {t('myRides.manage')}
                   <ArrowRightIcon className="h-4 w-4" />
                 </Link>
-                <button
-                  onClick={() => forget(r.id)}
-                  aria-label={t('myRides.forget')}
-                  title={t('myRides.forget')}
-                  className="shrink-0 rounded-lg p-2 text-slate-300 hover:bg-slate-100 hover:text-slate-500"
-                >
-                  <XIcon className="h-4 w-4" />
-                </button>
               </div>
             ))}
           </div>
