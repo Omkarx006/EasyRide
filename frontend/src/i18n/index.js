@@ -5,8 +5,8 @@ import en from './locales/en.json';
 import mr from './locales/mr.json';
 
 export const LANGUAGES = [
-  { code: 'en', label: 'English' },
-  { code: 'mr', label: 'मराठी' },
+  { code: 'en', label: 'English', short: 'ENG' },
+  { code: 'mr', label: 'मराठी', short: 'मरा' },
 ];
 
 // Apply a font-switching class on <html> so Marathi gets a Devanagari font.

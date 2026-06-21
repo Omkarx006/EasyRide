@@ -1,5 +1,5 @@
 import { supabase } from './supabase';
-import { todayISO } from './format';
+import { todayISO, seatsLeft } from './format';
 
 // All ride/booking data access lives here so components stay declarative and the
 // backend contract is in one place.
@@ -26,7 +26,9 @@ export async function fetchRides({ from, to, date } = {}) {
 
   const { data, error } = await query;
   if (error) throw error;
-  return data ?? [];
+  // Hide fully-booked rides automatically — a ride with no seats left is no longer
+  // useful to seekers (expired rides are already hidden by RLS at the date level).
+  return (data ?? []).filter((ride) => seatsLeft(ride) > 0);
 }
 
 // Fetch a single ride by id (non-secret columns). Returns null if not found /

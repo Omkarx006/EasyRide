@@ -52,6 +52,9 @@ export default function Rides() {
   // Client-side refinement: time-of-day bucket + minimum seats available.
   const visibleRides = useMemo(() => {
     return rides.filter((ride) => {
+      // Fully-booked rides disappear automatically (also catches a ride that just
+      // filled up via booking, without needing a refetch).
+      if (seatsLeft(ride) <= 0) return false;
       if (filters.time !== 'all' && timeBucket(ride.journey_time) !== filters.time) return false;
       if (filters.seats > 0 && seatsLeft(ride) < filters.seats) return false;
       return true;

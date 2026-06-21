@@ -57,16 +57,19 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile hamburger (< 768px) */}
-        <button
-          type="button"
-          onClick={() => setOpen((v) => !v)}
-          aria-label="Menu"
-          aria-expanded={open}
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-700 md:hidden"
-        >
-          {open ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
-        </button>
+        {/* Mobile cluster (< 768px): always-visible language switch + hamburger */}
+        <div className="flex items-center gap-2 md:hidden">
+          <LanguageToggle compact />
+          <button
+            type="button"
+            onClick={() => setOpen((v) => !v)}
+            aria-label="Menu"
+            aria-expanded={open}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-700"
+          >
+            {open ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+          </button>
+        </div>
       </nav>
 
       {/* Mobile slide-down menu */}
@@ -90,11 +93,6 @@ export default function Navbar() {
                 {t('nav.offerRide')}
                 <ArrowRightIcon className="h-4 w-4" />
               </Link>
-
-              <div className="mt-2 flex items-center justify-between border-t border-slate-100 px-1 pt-3">
-                <span className="text-sm font-medium text-slate-500">{t('nav.language')}</span>
-                <LanguageToggle />
-              </div>
             </div>
           </div>
         </>
