@@ -12,10 +12,25 @@
     scroll-behavior: smooth;
   }
 
+  /* Global guard against horizontal scrolling on mobile. */
+  html,
+  body {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
   body {
     @apply bg-white text-slate-800 antialiased;
     font-family: theme('fontFamily.sans');
     min-height: 100dvh;
+    width: 100%;
+  }
+
+  /* Media never forces the viewport wider than the screen. */
+  img,
+  svg,
+  video {
+    max-width: 100%;
   }
 
   /* When Marathi is active we add .lang-mr on <html> (see i18n/index.js) so
@@ -45,7 +60,7 @@
   }
 
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl px-5 py-3 text-sm font-semibold
            transition-all duration-200 outline-none focus-visible:ring-2 focus-visible:ring-brand-400
            focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60 select-none;
   }

@@ -24,7 +24,7 @@ export default function Home() {
       <section className="relative overflow-hidden bg-gradient-to-b from-brand-50 to-white">
         <div
           aria-hidden
-          className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-brand-200/40 blur-3xl"
+          className="pointer-events-none absolute right-0 -top-24 h-72 w-72 rounded-full bg-brand-200/40 blur-3xl"
         />
         <div className="container-px relative py-14 sm:py-20">
           <div className="mx-auto max-w-3xl text-center">

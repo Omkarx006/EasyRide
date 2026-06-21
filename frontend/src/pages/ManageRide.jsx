@@ -168,15 +168,15 @@ export default function ManageRide() {
             <ul className="divide-y divide-slate-100">
               {bookings.map((b, i) => (
                 <li key={i} className="flex items-center justify-between gap-3 py-3">
-                  <div className="flex items-center gap-3">
-                    <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-50 font-semibold text-brand-700">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 font-semibold text-brand-700">
                       {i + 1}
                     </span>
-                    <span className="font-medium text-slate-800">{b.passenger_name}</span>
+                    <span className="truncate font-medium text-slate-800">{b.passenger_name}</span>
                   </div>
                   <a
                     href={`tel:+91${b.passenger_phone}`}
-                    className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700"
+                    className="inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-brand-600 hover:text-brand-700"
                   >
                     <PhoneIcon className="h-4 w-4" />
                     {b.passenger_phone}

@@ -1,40 +1,104 @@
-import { Link, NavLink } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Link, NavLink, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageToggle from './LanguageToggle';
-import { CarIcon, ArrowRightIcon } from './Icons';
+import { CarIcon, ArrowRightIcon, MenuIcon, XIcon } from './Icons';
 
 export default function Navbar() {
   const { t } = useTranslation();
+  const [open, setOpen] = useState(false);
+  const location = useLocation();
 
-  const navLinkClass = ({ isActive }) =>
-    `text-sm font-medium transition ${
+  // Close the mobile menu on navigation.
+  useEffect(() => {
+    setOpen(false);
+  }, [location.pathname]);
+
+  // Lock background scroll while the mobile menu is open.
+  useEffect(() => {
+    document.body.style.overflow = open ? 'hidden' : '';
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [open]);
+
+  const desktopLink = ({ isActive }) =>
+    `whitespace-nowrap text-sm font-medium transition ${
       isActive ? 'text-brand-600' : 'text-slate-600 hover:text-brand-600'
     }`;
 
+  const mobileLink = ({ isActive }) =>
+    `block w-full rounded-xl px-4 py-3 text-base font-semibold transition ${
+      isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-700 hover:bg-slate-50'
+    }`;
+
   return (
-    <header className="sticky top-0 z-30 border-b border-slate-100 bg-white/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-slate-100 bg-white/95 backdrop-blur">
       <nav className="container-px flex h-16 items-center justify-between gap-3">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500 text-white">
+        {/* Logo — locked to one line */}
+        <Link to="/" className="flex shrink-0 items-center gap-2">
+          <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-brand-500 text-white sm:h-9 sm:w-9">
             <CarIcon className="h-5 w-5" />
           </span>
-          <span className="text-lg font-extrabold tracking-tight text-slate-900">
+          <span className="whitespace-nowrap text-base font-extrabold tracking-tight text-slate-900 sm:text-lg">
             {t('app.name')}
           </span>
         </Link>
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          <NavLink to="/rides" className={navLinkClass}>
-            <span className="hidden sm:inline">{t('nav.findRide')}</span>
-            <span className="sm:hidden">{t('nav.findRide')}</span>
+        {/* Desktop nav (>= 768px) */}
+        <div className="hidden items-center gap-4 md:flex">
+          <NavLink to="/rides" className={desktopLink}>
+            {t('nav.findRide')}
           </NavLink>
           <LanguageToggle />
-          <Link to="/create" className="btn-primary !px-3 !py-2 text-xs sm:!px-4 sm:text-sm">
+          <Link to="/create" className="btn-primary !px-4 !py-2 text-sm">
             {t('nav.offerRide')}
-            <ArrowRightIcon className="hidden h-4 w-4 sm:inline" />
+            <ArrowRightIcon className="h-4 w-4" />
           </Link>
         </div>
+
+        {/* Mobile hamburger (< 768px) */}
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          aria-label="Menu"
+          aria-expanded={open}
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-slate-200 text-slate-700 md:hidden"
+        >
+          {open ? <XIcon className="h-5 w-5" /> : <MenuIcon className="h-5 w-5" />}
+        </button>
       </nav>
+
+      {/* Mobile slide-down menu */}
+      {open && (
+        <>
+          <div
+            className="fixed inset-0 top-16 z-30 bg-slate-900/20 md:hidden"
+            onClick={() => setOpen(false)}
+            aria-hidden
+          />
+          <div className="animate-fade-up absolute inset-x-0 top-16 z-40 border-b border-slate-100 bg-white shadow-card md:hidden">
+            <div className="container-px flex flex-col gap-1 py-3">
+              <NavLink to="/rides" className={mobileLink} onClick={() => setOpen(false)}>
+                {t('nav.findRide')}
+              </NavLink>
+              <Link
+                to="/create"
+                onClick={() => setOpen(false)}
+                className="btn-primary mt-1 w-full justify-center !py-3 text-base"
+              >
+                {t('nav.offerRide')}
+                <ArrowRightIcon className="h-4 w-4" />
+              </Link>
+
+              <div className="mt-2 flex items-center justify-between border-t border-slate-100 px-1 pt-3">
+                <span className="text-sm font-medium text-slate-500">{t('nav.language')}</span>
+                <LanguageToggle />
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </header>
   );
 }

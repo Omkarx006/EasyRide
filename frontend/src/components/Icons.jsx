@@ -158,3 +158,11 @@ export function BoltIcon(props) {
     </svg>
   );
 }
+
+export function MenuIcon(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 6h18M3 12h18M3 18h18" />
+    </svg>
+  );
+}
