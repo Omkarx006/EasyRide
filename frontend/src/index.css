@@ -39,6 +39,16 @@
     font-family: theme('fontFamily.marathi');
   }
 
+  /* Negative letter-spacing distorts Devanagari conjuncts (e.g. ष्ट्र in
+     महाराष्ट्र), making words look misshapen. Keep tracking natural in Marathi. */
+  html.lang-mr,
+  html.lang-mr h1,
+  html.lang-mr h2,
+  html.lang-mr h3,
+  html.lang-mr h4 {
+    letter-spacing: normal;
+  }
+
   h1, h2, h3, h4 {
     @apply tracking-tight text-slate-900;
   }
