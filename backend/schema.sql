@@ -49,8 +49,12 @@ create index if not exists bookings_ride_id_idx on public.bookings (ride_id);
 
 -- ------------------------------------------------------------------ RLS -----
 grant usage on schema public to anon, authenticated;
--- SELECT is column-scoped so the secret manage_token is never exposed publicly.
 grant insert on public.rides to anon, authenticated;
+-- SELECT is column-scoped so the secret manage_token is never exposed publicly.
+-- IMPORTANT: a real Supabase project default-grants table-wide SELECT to anon,
+-- so we must REVOKE it first — otherwise the column grant below is merely
+-- additive and manage_token stays readable. (Mirrors migration 0005.)
+revoke select on public.rides from anon, authenticated;
 grant select (
   id, pickup_city, pickup_area, destination_city, destination_area,
   journey_date, journey_time, available_seats, booked_seats,
