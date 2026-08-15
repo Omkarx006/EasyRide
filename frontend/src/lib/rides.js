@@ -92,13 +92,49 @@ export async function createRide(ride) {
   return { id: data.id, manage_token: manageToken };
 }
 
-// Book one seat via the atomic SECURITY DEFINER RPC. Returns the parsed result:
-//   { success: true, booking_id, seats_left } | { success: false, error: <code> }
-export async function bookSeat({ rideId, passengerName, passengerPhone }) {
+// Book `seats` seats via the atomic SECURITY DEFINER RPC. Returns the parsed result:
+//   { success: true, booking_id, booking_token, seats, seats_left }
+//   | { success: false, error: <code> }
+// booking_token is the passenger's private proof of ownership — store it locally
+// (see myBookings.js); it is the only way to later edit this booking.
+export async function bookSeat({ rideId, passengerName, passengerPhone, seats = 1 }) {
   const { data, error } = await supabase.rpc('book_seat', {
     p_ride_id: rideId,
     p_passenger_name: passengerName.trim(),
     p_passenger_phone: passengerPhone.trim(),
+    p_seats: Number(seats) || 1,
+  });
+  if (error) throw error;
+  return data;
+}
+
+// Passenger-only: edit an existing booking, gated by its secret booking_token.
+// Adjusts the ride's seat count atomically (and re-checks availability when the
+// seat count grows). Returns { success, seats, seats_left } | { success:false, error }.
+export async function updateBooking({
+  bookingId,
+  bookingToken,
+  passengerName,
+  passengerPhone,
+  seats,
+}) {
+  const { data, error } = await supabase.rpc('update_booking', {
+    p_booking_id: bookingId,
+    p_booking_token: bookingToken,
+    p_passenger_name: passengerName.trim(),
+    p_passenger_phone: passengerPhone.trim(),
+    p_seats: Number(seats) || 1,
+  });
+  if (error) throw error;
+  return data;
+}
+
+// Passenger-only: fetch one booking's authoritative details (+ ride summary),
+// gated by its secret booking_token.
+export async function getBooking(bookingId, bookingToken) {
+  const { data, error } = await supabase.rpc('get_booking', {
+    p_booking_id: bookingId,
+    p_booking_token: bookingToken,
   });
   if (error) throw error;
   return data;

@@ -5,8 +5,10 @@ import SearchForm from '../components/SearchForm';
 import Filters from '../components/Filters';
 import RideCard from '../components/RideCard';
 import BookingModal from '../components/BookingModal';
+import MyBookingModal from '../components/MyBookingModal';
 import { Loader, ErrorState, EmptyRides, ConfigNotice } from '../components/States';
 import { fetchRides, isNetworkError } from '../lib/rides';
+import { getMyBookings } from '../lib/myBookings';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { timeBucket, seatsLeft, isRideActive } from '../lib/format';
 
@@ -31,6 +33,10 @@ export default function Rides() {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [bookingRide, setBookingRide] = useState(null);
+  const [manageRide, setManageRide] = useState(null);
+  // Bumped whenever this browser's bookings change, so cards + modals re-read them.
+  const [bookingsTick, setBookingsTick] = useState(0);
+  const refreshBookings = useCallback(() => setBookingsTick((n) => n + 1), []);
   // Re-evaluated every minute so rides drop off the moment they pass their
   // (journey time + 1h) expiry, even while the page stays open.
   const [now, setNow] = useState(Date.now());
@@ -72,6 +78,24 @@ export default function Rides() {
 
   const hasActiveFilters = filters.time !== 'all' || filters.seats > 0;
 
+  // This browser's bookings, grouped by ride id (re-read whenever they change).
+  const bookingsByRide = useMemo(() => {
+    const map = {};
+    for (const b of getMyBookings()) (map[b.rideId] ||= []).push(b);
+    return map;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bookingsTick]);
+
+  // Keep a ride's local seat count in sync after a booking/edit changes it.
+  const applySeatsLeft = useCallback((rideId, seatsLeftAfter) => {
+    if (typeof seatsLeftAfter !== 'number') return;
+    setRides((prev) =>
+      prev.map((r) =>
+        r.id === rideId ? { ...r, booked_seats: r.available_seats - seatsLeftAfter } : r,
+      ),
+    );
+  }, []);
+
   function handleSearch(params) {
     const qs = new URLSearchParams();
     if (params.from) qs.set('from', params.from);
@@ -81,15 +105,9 @@ export default function Rides() {
   }
 
   // Reflect a successful booking locally without a full refetch.
-  function handleBooked(seatsLeftAfter) {
-    if (!bookingRide) return;
-    setRides((prev) =>
-      prev.map((r) =>
-        r.id === bookingRide.id
-          ? { ...r, booked_seats: r.available_seats - seatsLeftAfter }
-          : r,
-      ),
-    );
+  function handleBooked(result) {
+    if (bookingRide) applySeatsLeft(bookingRide.id, result?.seats_left);
+    refreshBookings();
   }
 
   if (!isSupabaseConfigured) return <ConfigNotice />;
@@ -130,7 +148,13 @@ export default function Rides() {
           </p>
           <div className="grid gap-4 lg:grid-cols-2">
             {visibleRides.map((ride) => (
-              <RideCard key={ride.id} ride={ride} onBook={setBookingRide} />
+              <RideCard
+                key={ride.id}
+                ride={ride}
+                bookings={bookingsByRide[ride.id] || []}
+                onBook={setBookingRide}
+                onManageBookings={setManageRide}
+              />
             ))}
           </div>
         </>
@@ -141,6 +165,22 @@ export default function Rides() {
           ride={bookingRide}
           onClose={() => setBookingRide(null)}
           onBooked={handleBooked}
+        />
+      )}
+
+      {manageRide && (
+        <MyBookingModal
+          ride={manageRide}
+          bookings={bookingsByRide[manageRide.id] || []}
+          onClose={() => setManageRide(null)}
+          onBookAgain={(r) => {
+            setManageRide(null);
+            setBookingRide(rides.find((x) => x.id === r.id) || r);
+          }}
+          onChanged={(seatsLeftAfter) => {
+            applySeatsLeft(manageRide.id, seatsLeftAfter);
+            refreshBookings();
+          }}
         />
       )}
     </div>

@@ -8,13 +8,17 @@ import {
   ClockIcon,
   MapPinIcon,
   ArrowRightIcon,
+  CheckIcon,
 } from './Icons';
 
-export default function RideCard({ ride, onBook }) {
+export default function RideCard({ ride, bookings = [], onBook, onManageBookings }) {
   const { t, i18n } = useTranslation();
   const lang = i18n.resolvedLanguage;
   const left = seatsLeft(ride);
   const isFull = left <= 0;
+  // Has this browser booked this ride? (Ownership is local — see myBookings.js.)
+  const hasBooked = bookings.length > 0;
+  const mySeats = bookings.reduce((sum, b) => sum + (b.seats || 1), 0);
 
   const dateLabel = formatDate(ride.journey_date, lang);
   const timeLabel = formatTime(ride.journey_time, lang);
@@ -77,15 +81,26 @@ export default function RideCard({ ride, onBook }) {
           <WhatsAppIcon className="h-4 w-4" />
           {t('ride.whatsapp')}
         </a>
-        <button
-          type="button"
-          onClick={() => onBook(ride)}
-          disabled={isFull}
-          className="btn-primary !py-2.5 text-xs col-span-2 sm:col-span-1"
-        >
-          <UsersIcon className="h-4 w-4" />
-          {isFull ? t('ride.full') : t('ride.book')}
-        </button>
+        {hasBooked ? (
+          <button
+            type="button"
+            onClick={() => onManageBookings(ride)}
+            className="btn !py-2.5 text-xs col-span-2 sm:col-span-1 bg-green-600 text-white hover:bg-green-700"
+          >
+            <CheckIcon className="h-4 w-4" />
+            {t('ride.seatsBooked', { count: mySeats })}
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onBook(ride)}
+            disabled={isFull}
+            className="btn-primary !py-2.5 text-xs col-span-2 sm:col-span-1"
+          >
+            <UsersIcon className="h-4 w-4" />
+            {isFull ? t('ride.full') : t('ride.book')}
+          </button>
+        )}
       </div>
     </article>
   );

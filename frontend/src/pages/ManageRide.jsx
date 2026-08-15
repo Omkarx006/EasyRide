@@ -174,7 +174,12 @@ export default function ManageRide() {
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-50 font-semibold text-brand-700">
                       {i + 1}
                     </span>
-                    <span className="truncate font-medium text-slate-800">{b.passenger_name}</span>
+                    <span className="min-w-0 truncate font-medium text-slate-800">
+                      {b.passenger_name}
+                      <span className="ml-1.5 text-xs font-normal text-slate-400">
+                        · {t('myBooking.seatsCount', { count: b.seats || 1 })}
+                      </span>
+                    </span>
                   </div>
                   <a
                     href={`tel:+91${b.passenger_phone}`}

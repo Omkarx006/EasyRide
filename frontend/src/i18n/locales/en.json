@@ -101,6 +101,8 @@
     "call": "Call",
     "whatsapp": "WhatsApp",
     "book": "Book Seat",
+    "seatsBooked_one": "{{count}} Seat Booked",
+    "seatsBooked_other": "{{count}} Seats Booked",
     "whatsappMessage": "Hello {{name}}, I saw your SahPravas ride from {{from}} to {{to}} on {{date}}. Is a seat still available?"
   },
   "rides": {
@@ -184,6 +186,7 @@
     "passengerPhone": "Your phone number",
     "namePlaceholder": "e.g. Sunita Jadhav",
     "phonePlaceholder": "10-digit mobile number",
+    "seats": "Number of seats",
     "note": "The driver will see your name and number so they can coordinate the pickup.",
     "confirm": "Confirm Booking",
     "booking": "Booking…",
@@ -194,13 +197,26 @@
       "done": "Done"
     },
     "errors": {
-      "no_seats": "Sorry, this ride just became fully booked.",
+      "no_seats": "Sorry, there aren't enough seats left for that.",
       "ride_expired": "This ride has already departed.",
       "ride_not_found": "This ride is no longer available.",
       "invalid_phone": "Please enter a valid 10-digit phone number.",
       "invalid_name": "Please enter your name.",
+      "invalid_seats": "Please choose at least one seat.",
+      "not_found_or_bad_token": "This booking can't be edited from this device.",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "myBooking": {
+    "title": "My Booking",
+    "titlePlural": "My Bookings",
+    "bookingN": "Booking {{n}}",
+    "seatsCount_one": "{{count}} seat",
+    "seatsCount_other": "{{count}} seats",
+    "edit": "Edit Booking",
+    "save": "Save",
+    "saving": "Saving…",
+    "bookAgain": "Book Again"
   },
   "validation": {
     "required": "This field is required",

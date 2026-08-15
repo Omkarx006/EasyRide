@@ -1,15 +1,20 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { bookSeat } from '../lib/rides';
-import { formatDate } from '../lib/format';
+import { addMyBooking } from '../lib/myBookings';
+import { formatDate, seatsLeft } from '../lib/format';
 import { CheckCircleIcon, XIcon, UsersIcon } from './Icons';
+import SeatStepper from './SeatStepper';
 
-// Books a single seat through the atomic book_seat() RPC. Shows inline validation,
-// maps server error codes to friendly messages, and a success confirmation.
+// Books one or more seats through the atomic book_seat() RPC, records the new
+// booking (with its secret token) locally, shows inline validation, maps server
+// error codes to friendly messages, and a success confirmation.
 export default function BookingModal({ ride, onClose, onBooked }) {
   const { t, i18n } = useTranslation();
+  const maxSeats = Math.max(1, seatsLeft(ride));
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
+  const [seats, setSeats] = useState(1);
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -44,10 +49,22 @@ export default function BookingModal({ ride, onClose, onBooked }) {
         rideId: ride.id,
         passengerName: name,
         passengerPhone: phone,
+        seats,
       });
       if (result?.success) {
+        // Persist ownership locally so this browser can view/edit the booking later.
+        addMyBooking({
+          bookingId: result.booking_id,
+          token: result.booking_token,
+          rideId: ride.id,
+          passengerName: name.trim(),
+          passengerPhone: phone.trim(),
+          seats: result.seats,
+          route: `${ride.pickup_city} → ${ride.destination_city}`,
+          date: ride.journey_date,
+        });
         setDone(true);
-        onBooked?.(result.seats_left);
+        onBooked?.(result);
       } else {
         const code = result?.error || 'generic';
         setServerError(t(`booking.errors.${code}`, t('booking.errors.generic')));
@@ -131,6 +148,13 @@ export default function BookingModal({ ride, onClose, onBooked }) {
                 />
                 {errors.phone && <p className="field-error">{errors.phone}</p>}
               </div>
+
+              <SeatStepper
+                label={t('booking.seats')}
+                value={seats}
+                onChange={setSeats}
+                max={maxSeats}
+              />
 
               <p className="rounded-xl bg-brand-50 px-3 py-2 text-xs text-brand-700">
                 {t('booking.note')}

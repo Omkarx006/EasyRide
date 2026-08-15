@@ -42,6 +42,10 @@ create table if not exists public.bookings (
   ride_id         uuid        not null references public.rides(id) on delete cascade,
   passenger_name  text        not null,
   passenger_phone text        not null check (passenger_phone ~ '^[0-9]{10}$'),
+  -- How many seats this one booking reserves, and a per-booking SECRET the
+  -- passenger keeps in their browser as proof of ownership (mirrors rides.manage_token).
+  seats           int         not null default 1 check (seats > 0),
+  booking_token   uuid        not null default gen_random_uuid(),
   created_at      timestamptz not null default now()
 );
 
@@ -82,10 +86,12 @@ create policy rides_insert_public
   with check (booked_seats = 0 and journey_date >= public.sah_today() and available_seats > 0);
 
 -- -------------------------------------------------------- book_seat RPC -----
+drop function if exists public.book_seat(uuid, text, text);
 create or replace function public.book_seat(
   p_ride_id         uuid,
   p_passenger_name  text,
-  p_passenger_phone text
+  p_passenger_phone text,
+  p_seats           int default 1
 )
 returns json
 language plpgsql
@@ -93,15 +99,19 @@ security definer
 set search_path = public
 as $$
 declare
-  v_ride       public.rides;
-  v_booking_id uuid;
-  v_name       text := trim(coalesce(p_passenger_name, ''));
+  v_ride    public.rides;
+  v_booking public.bookings;
+  v_name    text := trim(coalesce(p_passenger_name, ''));
+  v_seats   int  := coalesce(p_seats, 1);
 begin
   if v_name = '' then
     return json_build_object('success', false, 'error', 'invalid_name');
   end if;
   if p_passenger_phone !~ '^[0-9]{10}$' then
     return json_build_object('success', false, 'error', 'invalid_phone');
+  end if;
+  if v_seats < 1 then
+    return json_build_object('success', false, 'error', 'invalid_seats');
   end if;
 
   select * into v_ride from public.rides where id = p_ride_id for update;
@@ -112,30 +122,122 @@ begin
   if v_ride.journey_date < public.sah_today() then
     return json_build_object('success', false, 'error', 'ride_expired');
   end if;
-  if v_ride.booked_seats >= v_ride.available_seats then
+  if v_ride.booked_seats + v_seats > v_ride.available_seats then
     return json_build_object('success', false, 'error', 'no_seats');
   end if;
 
-  insert into public.bookings (ride_id, passenger_name, passenger_phone)
-  values (p_ride_id, v_name, p_passenger_phone)
-  returning id into v_booking_id;
+  insert into public.bookings (ride_id, passenger_name, passenger_phone, seats)
+  values (p_ride_id, v_name, p_passenger_phone, v_seats)
+  returning * into v_booking;
 
-  update public.rides set booked_seats = booked_seats + 1 where id = p_ride_id;
+  update public.rides set booked_seats = booked_seats + v_seats where id = p_ride_id;
 
   return json_build_object(
     'success', true,
-    'booking_id', v_booking_id,
-    'seats_left', v_ride.available_seats - (v_ride.booked_seats + 1)
+    'booking_id', v_booking.id,
+    'booking_token', v_booking.booking_token,
+    'seats', v_seats,
+    'seats_left', v_ride.available_seats - (v_ride.booked_seats + v_seats)
   );
 end;
 $$;
+grant execute on function public.book_seat(uuid, text, text, int) to anon, authenticated;
 
-grant execute on function public.book_seat(uuid, text, text) to anon, authenticated;
+-- get_booking: passenger reads their own booking (+ ride summary), token-gated.
+create or replace function public.get_booking(p_booking_id uuid, p_booking_token uuid)
+returns json language plpgsql security definer set search_path = public
+as $$
+declare
+  v_b public.bookings;
+  v_r public.rides;
+begin
+  select * into v_b from public.bookings
+    where id = p_booking_id and booking_token = p_booking_token;
+  if not found then
+    return json_build_object('success', false, 'error', 'not_found_or_bad_token');
+  end if;
+  select * into v_r from public.rides where id = v_b.ride_id;
+  return json_build_object(
+    'success', true,
+    'booking_id', v_b.id,
+    'passenger_name', v_b.passenger_name,
+    'passenger_phone', v_b.passenger_phone,
+    'seats', v_b.seats,
+    'ride', json_build_object(
+      'id', v_r.id,
+      'pickup_city', v_r.pickup_city, 'pickup_area', v_r.pickup_area,
+      'destination_city', v_r.destination_city, 'destination_area', v_r.destination_area,
+      'journey_date', v_r.journey_date, 'journey_time', v_r.journey_time,
+      'available_seats', v_r.available_seats, 'booked_seats', v_r.booked_seats,
+      'seats_left', v_r.available_seats - v_r.booked_seats
+    )
+  );
+end;
+$$;
+grant execute on function public.get_booking(uuid, uuid) to anon, authenticated;
+
+-- update_booking: passenger edits their own booking (token-gated); keeps
+-- rides.booked_seats correct and re-checks availability when growing a booking.
+create or replace function public.update_booking(
+  p_booking_id uuid, p_booking_token uuid,
+  p_passenger_name text, p_passenger_phone text, p_seats int
+)
+returns json language plpgsql security definer set search_path = public
+as $$
+declare
+  v_b     public.bookings;
+  v_ride  public.rides;
+  v_name  text := trim(coalesce(p_passenger_name, ''));
+  v_seats int  := coalesce(p_seats, 1);
+  v_delta int;
+begin
+  if v_name = '' then
+    return json_build_object('success', false, 'error', 'invalid_name');
+  end if;
+  if p_passenger_phone !~ '^[0-9]{10}$' then
+    return json_build_object('success', false, 'error', 'invalid_phone');
+  end if;
+  if v_seats < 1 then
+    return json_build_object('success', false, 'error', 'invalid_seats');
+  end if;
+
+  select * into v_b from public.bookings
+    where id = p_booking_id and booking_token = p_booking_token for update;
+  if not found then
+    return json_build_object('success', false, 'error', 'not_found_or_bad_token');
+  end if;
+
+  select * into v_ride from public.rides where id = v_b.ride_id for update;
+  if not found then
+    return json_build_object('success', false, 'error', 'ride_not_found');
+  end if;
+
+  v_delta := v_seats - v_b.seats;
+  if v_delta > 0 and v_ride.booked_seats + v_delta > v_ride.available_seats then
+    return json_build_object('success', false, 'error', 'no_seats');
+  end if;
+
+  update public.bookings
+    set passenger_name = v_name, passenger_phone = p_passenger_phone, seats = v_seats
+    where id = p_booking_id;
+
+  if v_delta <> 0 then
+    update public.rides set booked_seats = booked_seats + v_delta where id = v_ride.id;
+  end if;
+
+  return json_build_object(
+    'success', true, 'booking_id', v_b.id, 'seats', v_seats,
+    'seats_left', v_ride.available_seats - (v_ride.booked_seats + v_delta)
+  );
+end;
+$$;
+grant execute on function public.update_booking(uuid, uuid, text, text, int) to anon, authenticated;
 
 -- ----------------------------------------------- creator "Manage Ride" -------
 -- View bookings for a ride, only with the correct secret manage token.
+drop function if exists public.get_ride_bookings(uuid, uuid);
 create or replace function public.get_ride_bookings(p_ride_id uuid, p_manage_token uuid)
-returns table (passenger_name text, passenger_phone text, created_at timestamptz)
+returns table (passenger_name text, passenger_phone text, seats int, created_at timestamptz)
 language plpgsql security definer set search_path = public
 as $$
 begin
@@ -145,7 +247,7 @@ begin
     return;
   end if;
   return query
-    select b.passenger_name, b.passenger_phone, b.created_at
+    select b.passenger_name, b.passenger_phone, b.seats, b.created_at
     from public.bookings b where b.ride_id = p_ride_id order by b.created_at;
 end;
 $$;
