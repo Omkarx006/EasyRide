@@ -6,7 +6,7 @@ import Filters from '../components/Filters';
 import RideCard from '../components/RideCard';
 import BookingModal from '../components/BookingModal';
 import { Loader, ErrorState, EmptyRides, ConfigNotice } from '../components/States';
-import { fetchRides } from '../lib/rides';
+import { fetchRides, isNetworkError } from '../lib/rides';
 import { isSupabaseConfigured } from '../lib/supabase';
 import { timeBucket, seatsLeft, isRideActive } from '../lib/format';
 
@@ -27,7 +27,8 @@ export default function Rides() {
 
   const [rides, setRides] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(false);
+  // null = no error; otherwise a { message } describing the failure.
+  const [error, setError] = useState(null);
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [bookingRide, setBookingRide] = useState(null);
   // Re-evaluated every minute so rides drop off the moment they pass their
@@ -40,12 +41,14 @@ export default function Rides() {
 
   const load = useCallback(async () => {
     setLoading(true);
-    setError(false);
+    setError(null);
     try {
       const data = await fetchRides(search);
       setRides(data);
-    } catch {
-      setError(true);
+    } catch (err) {
+      // Backend unreachable (DNS/offline/project down) gets a clearer message;
+      // anything else falls back to the generic error title.
+      setError({ message: isNetworkError(err) ? t('common.unreachable') : '' });
     } finally {
       setLoading(false);
     }
@@ -117,7 +120,7 @@ export default function Rides() {
       {loading ? (
         <Loader label={t('rides.loading')} />
       ) : error ? (
-        <ErrorState onRetry={load} />
+        <ErrorState message={error.message} onRetry={load} />
       ) : visibleRides.length === 0 ? (
         <EmptyRides />
       ) : (

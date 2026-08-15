@@ -219,6 +219,7 @@
     "close": "Close",
     "retry": "Try again",
     "error": "Something went wrong",
+    "unreachable": "Can't reach the server right now. The service may be temporarily unavailable — please try again in a few minutes.",
     "loading": "Loading…"
   },
   "config": {

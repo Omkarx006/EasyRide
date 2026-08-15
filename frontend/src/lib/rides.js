@@ -4,6 +4,24 @@ import { todayISO, isRideActive } from './format';
 // All ride/booking data access lives here so components stay declarative and the
 // backend contract is in one place.
 
+// True when an error is a transport-level failure (DNS/offline/host unreachable)
+// rather than a Postgrest/DB error. Fetch rejections surface as a TypeError with
+// a "Failed to fetch"-style message and carry no Postgrest `code`; real DB errors
+// (RLS, constraints, …) always have a `code`. Used to show a clearer
+// "service unavailable" message instead of a generic retry loop.
+export function isNetworkError(err) {
+  if (!err) return false;
+  if (err.code) return false; // Postgrest/DB error, not a transport failure.
+  const msg = String(err.message || err).toLowerCase();
+  return (
+    err.name === 'TypeError' ||
+    msg.includes('failed to fetch') ||
+    msg.includes('networkerror') ||
+    msg.includes('network request failed') ||
+    msg.includes('load failed')
+  );
+}
+
 // Non-secret ride columns. We never select "*" because the secret manage_token
 // column is not readable by the anon role (see migration 0005).
 const RIDE_COLUMNS =
