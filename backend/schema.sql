@@ -1,13 +1,15 @@
 -- ============================================================================
--- SahPravas — Full schema (convenience copy of migrations 0001–0003)
+-- SahPravas — Full schema (complete installer, folds in migrations 0001–0005)
 --
--- This single file is equivalent to running, in order:
---   migrations/0001_init.sql
---   migrations/0002_rls.sql
---   migrations/0003_book_seat.sql
+-- This single file is the entire current schema. Running it on a fresh project
+-- is equivalent to applying, in order:
+--   0001_init.sql · 0002_rls.sql · 0003_book_seat.sql
+--   0004_ist_expiry.sql (IST expiry / sah_today)
+--   0005_manage_ride.sql (manage_token + get_ride_bookings/delete_ride)
 --
--- Paste it into the Supabase SQL Editor and Run, or apply the migrations
--- individually. Safe to re-run (idempotent).
+-- To provision a NEW Supabase project: paste this whole file into the SQL Editor
+-- and Run. That is all — you do NOT need to run the individual migration files.
+-- Safe to re-run (idempotent).
 -- ============================================================================
 
 create extension if not exists "pgcrypto";
