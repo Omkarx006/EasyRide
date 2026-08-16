@@ -5,7 +5,9 @@ export default function Footer() {
   const { t } = useTranslation();
 
   return (
-    <footer className="mt-16 border-t border-slate-100 bg-slate-50">
+    // The extra bottom padding on mobile keeps the last of the content clear of
+    // the fixed bottom navigation (plus the phone's gesture-bar safe area).
+    <footer className="mt-16 border-t border-slate-100 bg-slate-50 pb-[calc(4.75rem+env(safe-area-inset-bottom))] md:pb-0">
       <div className="container-px py-10">
         <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">

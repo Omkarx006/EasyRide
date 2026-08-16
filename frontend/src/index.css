@@ -26,6 +26,20 @@
     width: 100%;
   }
 
+  /* While two screens slide past each other (components/SwipePages.jsx) the
+     document itself must stay put and text must not get selected mid-drag. */
+  html.is-swiping,
+  body.is-swiping {
+    overflow: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  /* Screen changes reposition the document instantly, never with a smooth scroll. */
+  html.is-swiping {
+    scroll-behavior: auto;
+  }
+
   /* Media never forces the viewport wider than the screen. */
   img,
   svg,

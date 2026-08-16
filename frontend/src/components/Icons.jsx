@@ -183,3 +183,12 @@ export function PlusIcon(props) {
     </svg>
   );
 }
+
+export function TicketIcon(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 9V7a1 1 0 011-1h16a1 1 0 011 1v2a2.5 2.5 0 000 5v2a1 1 0 01-1 1H4a1 1 0 01-1-1v-2a2.5 2.5 0 000-5z" />
+      <path d="M14 6v2M14 11v2M14 16v2" />
+    </svg>
+  );
+}

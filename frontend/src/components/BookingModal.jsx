@@ -84,6 +84,7 @@ export default function BookingModal({ ride, onClose, onBooked }) {
 
   return (
     <div
+      data-no-swipe
       className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/50 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={onClose}
     >

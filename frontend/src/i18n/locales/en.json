@@ -8,7 +8,14 @@
     "findRide": "Find a Ride",
     "myRides": "My Rides",
     "offerRide": "Offer a Ride",
-    "language": "Language"
+    "language": "Language",
+    "mainScreens": "Main screens",
+    "tabs": {
+      "find": "Find Ride",
+      "offer": "Offer Ride",
+      "created": "Created Rides",
+      "bookings": "My Bookings"
+    }
   },
   "myRides": {
     "title": "My Rides",
@@ -206,6 +213,16 @@
       "not_found_or_bad_token": "This booking can't be edited from this device.",
       "generic": "Something went wrong. Please try again."
     }
+  },
+  "myBookings": {
+    "title": "My Bookings",
+    "subtitle": "Seats you've booked from this device.",
+    "emptyTitle": "No bookings yet",
+    "emptyMessage": "You haven't booked a seat from this device. Find a ride and your booking will appear here so you can edit it anytime.",
+    "note": "Saved on this device only — no account needed. Open a booking to change your name, phone or seats, or to book again.",
+    "manage": "My Booking",
+    "unavailable": "This ride is no longer listed — it may have departed or been removed.",
+    "forget": "Remove from list"
   },
   "myBooking": {
     "title": "My Booking",
