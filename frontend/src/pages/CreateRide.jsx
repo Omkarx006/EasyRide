@@ -115,6 +115,7 @@ export default function CreateRide() {
         token: created.manage_token,
         route: `${form.pickup_city} → ${form.destination_city}`,
         date: form.journey_date,
+        time: form.journey_time,
       });
       setDone(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });

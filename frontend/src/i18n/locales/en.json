@@ -24,7 +24,14 @@
     "emptyMessage": "You haven't published any rides on this device. Offer one and it'll appear here so you can manage it anytime.",
     "note": "Saved on this device only — no account needed. Tap Manage to see who booked or to delete a ride.",
     "manage": "Manage",
-    "forget": "Remove from list"
+    "forget": "Remove from list",
+    "clearPast": "Clear Past Rides",
+    "clearPastTitle": "Clear Past Rides?",
+    "clearPastMessage": "This will remove all completed/past rides from your Created Rides dashboard. Upcoming rides will not be affected. Nothing is deleted online — only this device's list changes.",
+    "clearPastCancel": "Cancel",
+    "noPastRides": "No past rides to clear.",
+    "pastCount_one": "{{count}} past ride can be cleared.",
+    "pastCount_other": "{{count}} past rides can be cleared."
   },
   "trust": {
     "badge": "No Commission • No Ads • Completely Free",
